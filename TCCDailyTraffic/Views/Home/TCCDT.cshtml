@@ -1,0 +1,309 @@
+﻿
+@using System.Data
+@model DataSet
+
+@{
+    ViewBag.Title = "TCCDT";
+}
+
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <link href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css" rel="stylesheet" />
+    <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js" type="text/javascript"></script>
+    <link href="../Content/style.css" rel="stylesheet" />
+
+</head>
+<body style="min-height: 0vh;" onload="loadingFunc()">
+    <div id="loading"></div>
+    <div class="header bg-primary pb-6" style="background-color: white;">
+
+        <div class="p-3 mb-2 bg-gradient-primary " style="overflow-x: auto; background-color: white;">
+            
+            @using (Html.BeginForm("TCCDT", "Home", FormMethod.Post, new { enctype = "multipart/form-data"  }))
+            {
+
+                @*<div class="form-group mt-8 form col-md-6">
+                        <div class="col-md-6 center">
+                            @Html.Label("Sync Start Date", new { @style = "color:Black;" })
+                            @Html.TextBox("createdStartDate", null, new { @type = "date", @class = "form-control", @placeholder = "Start Date", @Required = "Required" })
+
+                        </div>
+                        <div class="col-md-6 center">
+                            @Html.Label("Sync End Date", new { @style = "color:Black;" })
+                            @Html.TextBox("createdEndDate", null, new { @type = "date", @class = "form-control", @placeholder = "End Date", @Required = "Required" })
+                        </div>
+                        <div class="col-sm-1 top-right button">
+                                <input class="btn btn-primary text-Black" type="submit" value="Go" style="font-weight:bold;" />
+                            </div>
+                    </div>*@
+                <center> <h1 id="TopH">TCC Daily Traffic Audit</h1></center>
+                <div class="form-group mt-8 form col-md-4">
+                   
+                    <div class="col-md-6 top-right button">
+                        <input type="file" name="postedFile" style="display:inline-flex;color:#fe5000; font:large; " required="required" />
+                    </div>
+
+                    <div class="col-sm-6  button2">
+                        <input type="submit" value="Deploye File" style="display:inline-flex; background-color:#fe5000" class="btn text-Black" />
+                    </div>
+                </div>
+            }
+
+            <button type="button" class="btn text-Black col-sm-1 button3" data-toggle="modal" data-target="#Audit" style="background-color:#fe5000">Audit</button>
+            @using (Html.BeginForm("Portal_Monitoring_Click", "Home", FormMethod.Post))
+            {
+                <input type="submit" value="Portal Login" style="display:inline-flex; background-color:#fe5000" class="btn col-sm-1 text-Black button4" />
+
+            }
+        </div>
+
+
+
+        <div class="header bg-primary pb-6 table-responsive" style="background-color:White; box-shadow: 10px 10px 5px grey; border:1px solid black;display:block; margin:0px 0px 17px 0px">
+            <center><h2 style="color:#fe5000; ">TCC Portal Percentages</h2></center>
+            <label style="color:#fe5000; font-size:large;"> Daily Monitoring Detail Percentage : </label><label style="color:black; font-size:large;">@Session["Result0"]</label>
+            <br />
+            <label style="color:#fe5000; font-size:large;"> Customer Conversion Percentage : </label><label style="color:black; font-size:large;">@Session["Result1"]</label>
+        </div>
+
+        <div class="header bg-primary pb-6 table-responsive" style="background-color: white;margin:0px 0px 17px 0px; box-shadow: 10px 10px 5px grey; border:1px solid black; height:30%; ">
+            <center>
+                <div style="background-color:white; box-shadow: 10px 10px 5px grey; display:inline-flex; border:1px solid black;">
+                    <h4 style="text-align:center; color:#fe5000; ">TCC Database Traffic </h4>
+                </div>
+            </center>
+            @if (Model != null)
+            {
+
+                <table class="table table-striped mt-7" id="T1" style="font-size: 18px; ">
+                    <thead>
+
+                        <tr>
+
+                            <th>Total Rows</th>
+                            @for (int j = 3; j < Model.Tables[0].Columns.Count; j++)
+                            {
+                                <th>@Model.Tables[0].Columns[j].ColumnName</th>
+                            }
+
+                        </tr>
+
+                    </thead>
+                    @{
+                        int a = 0;
+                        int k = 0;
+
+                    }
+
+                    <tbody id="record" style="overflow-y:auto; background-color:#fa9a6e; ">
+                        <tr>
+                            <td>@Model.Tables[0].Rows.Count</td>
+                            @for (int i = 3; i < Model.Tables[0].Columns.Count; i++)
+                            {
+
+                                a = 0;
+                                for (k = 0; k < Model.Tables[0].Rows.Count; k++)
+                                {
+                                    a += Convert.ToInt32(@Model.Tables[0].Rows[k][Model.Tables[0].Columns[i]]);
+                                }
+
+                                <td>@a</td>
+                            }
+
+                        </tr>
+
+                    </tbody>
+                </table>
+
+                        }
+
+
+        </div>
+        
+        <div class="header bg-primary pb-6 table-responsive" style="background-color: white; box-shadow: 10px 10px 5px grey;  border:1px solid black;  height:30%; ">
+            <center>
+                <div style="background-color:white; box-shadow: 10px 10px 5px grey; display:inline-flex; border:1px solid black;">
+                    <h4 style="text-align:center; color:#fe5000;"T>TCC Excel File Traffic</h4>
+                </div>
+            </center>
+            @if (Model != null)
+            {
+
+                <table class="table table-striped mt-7" id="T1" style="font-size: 18px; ">
+                    <thead>
+
+                        <tr>
+                            <th>Total Rows</th>
+                            @for (int j = 3; j < Model.Tables[1].Columns.Count; j++)
+                            {
+                                <th>@Model.Tables[1].Columns[j].ColumnName</th>
+                            }
+                        </tr>
+
+                    </thead>
+                    @{
+                        int b = 0;
+
+                    }
+                    <tbody id="record" style="overflow-y:auto; background-color:#fa9a6e;">
+                        <tr>
+                            <td>@Model.Tables[1].Rows.Count</td>
+                            @for (int i = 3; i < Model.Tables[1].Columns.Count; i++)
+                            {
+
+                                b = 0;
+                                for (int k = 0; k < Model.Tables[1].Rows.Count; k++)
+                                {
+                                    b += Convert.ToInt32(@Model.Tables[1].Rows[k][Model.Tables[1].Columns[i]]);
+                                }
+                                <td>@b</td>
+                            }
+                        </tr>
+                    </tbody>
+                </table>
+                        }
+
+        </div>
+
+        <div class="modal " tabindex="-1" role="dialog" id="Audit">
+            <div class="modal-dialog modal-lg" style="width:80%;" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <center>
+                            <div style="background-color:white; box-shadow: 10px 10px 5px grey; display:inline-flex; border:1px solid black;">
+                                <label style="color:#fe5000; font-size:large; ">Audited Record</label>
+                            </div>
+                        </center>
+                      
+                        @*<button style="display:inline-flex; background-color:#fe5000" class="btn col-sm-1 text-Black button4" onclick="">
+                       Downlod
+                          </button>*@
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="header bg-primary pb-6 table-responsive" style="background-color: white; margin:0px 0px 17px 0px; box-shadow: 10px 10px 5px grey; border:1px solid black; height:40%; ">
+                            <center>
+                                <div style="background-color:white; box-shadow: 10px 10px 5px grey; display:inline-flex; border:1px solid black;">
+                                    <h4 style="text-align:center; color:#fe5000; ">TCC Database Traffic </h4>
+                                </div>
+                            </center>
+                           
+                            
+                                @if (Model != null)
+                                {
+                                   
+                                    <table class="table table-striped mt-7" id="Tcc1" style="font-size: 18px; ">
+                                        <thead>
+                                            <tr>
+                                                <th>Sr.</th>
+                                                @foreach (DataColumn col in Model.Tables[2].Columns)
+                                                {
+                                                    <th>@col.ColumnName</th>
+                                                }
+                                            </tr>
+
+                                        </thead>
+                                        @{
+                                            int a = 1;
+                                        }
+                                        <tbody id="record" style="overflow-y:auto; ">
+                                            @for (int j = 0; j < Model.Tables[2].Rows.Count; j++)
+                                            {
+                                                <tr>
+                                                    <td>@a</td>
+                                                    @{ a++;}
+                                                    @for (int i = 0; i < Model.Tables[2].Columns.Count; i++)
+                                                    {
+                                                        <td>@Model.Tables[2].Rows[j][Model.Tables[2].Columns[i]]</td>
+                                                    }
+                                                </tr>
+                                                        }
+                                        </tbody>
+
+
+
+                                    </table>
+
+                                                            } 
+</div>
+                        <div class="header bg-primary pb-6 table-responsive" style="background-color:white; box-shadow: 10px 10px 5px grey; border:1px solid black; height:40%; ">
+                            <center>
+                                <div style="background-color:white; box-shadow: 10px 10px 5px grey; display:inline-flex; border:1px solid black;">
+                                    <h4 style="text-align:center; color:#fe5000;">TCC Excel File Traffic</h4>
+                                </div>
+                            </center>
+
+                            @if (Model != null)
+                            {
+
+                                <table class="table table-striped mt-7" id="Tcc1" style="font-size: 18px; ">
+                                    <thead>
+                                        <tr>
+                                            <th>Sr.</th>
+                                            @foreach (DataColumn col in Model.Tables[3].Columns)
+                                            {
+                                                <th>@col.ColumnName</th>
+                                            }
+                                        </tr>
+
+                                    </thead>
+                                    @{
+                                        int b = 1;
+                                    }
+                                    <tbody id="record" style="overflow-y:auto; ">
+                                        @for (int j = 0; j < Model.Tables[3].Rows.Count; j++)
+                                        {
+                                            <tr>
+                                                <td>@b</td>
+                                                @{ b++;}
+                                                @for (int i = 0; i < Model.Tables[3].Columns.Count; i++)
+                                                {
+                                                    <td>@Model.Tables[3].Rows[j][Model.Tables[3].Columns[i]]</td>
+                                                }
+                                            </tr>
+                                                    }
+                                    </tbody>
+
+                                </table>
+                                                    }
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+
+    <script>
+
+        // $(document).ready(function(){
+        // 	$('div#loading').removeAttr('id');
+        // });
+        var preloader = document.getElementById("loading");
+        // window.addEventListener('load', function(){
+        // 	preloader.style.display = 'none';
+        // 	})
+
+       // function btnloading() {
+         //   preloader.style.display = 'block'
+        //};
+
+        function loadingFunc() {
+            preloader.style.display = 'none';
+        };
+
+        //$(document).ready(function () {
+        //    $('#Tcc1').DataTable({
+        //        "ordering": false,
+        //    });
+        //});
+    </script>
